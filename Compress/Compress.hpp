@@ -12,7 +12,7 @@ struct Data {
 };
 
 
-constexpr size_t sizeX{ 2 };
+constexpr size_t sizeX{ 6 };
 constexpr size_t sizeY{ 3 };
 
 template<typename T>

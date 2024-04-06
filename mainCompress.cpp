@@ -34,4 +34,7 @@ int main() {
 	else {
 		std::cout << "Compression has larger size than original array\n";
 	}
+
+	std::cout << "Press Enter to exit...";
+	std::cin.get();
 }

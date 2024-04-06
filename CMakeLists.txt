@@ -42,13 +42,12 @@ target_link_libraries(NOVOMATICLIB ${CMAKE_SOURCE_DIR}/SFML/lib/sfml-window.lib)
 
 include_directories(${CMAKE_SOURCE_DIR}/SFML/include)
 
+
+
+# Copy .dll files into build/x64-Debug
 file(GLOB SFML_BIN_FILES ${CMAKE_SOURCE_DIR}/SFML/bin/*)
 
-# Copy .dll files into build/x64-Debug directory
 foreach(sfml_bin_file ${SFML_BIN_FILES})
     get_filename_component(filename ${sfml_bin_file} NAME)
     configure_file(${CMAKE_SOURCE_DIR}/SFML/bin/${filename} ${CMAKE_SOURCE_DIR}/out/build/x64-Debug/ COPYONLY)
 endforeach(sfml_bin_file ${SFML_BIN_FILES})
-
-
-
