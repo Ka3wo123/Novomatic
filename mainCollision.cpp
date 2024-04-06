@@ -37,8 +37,10 @@ void move(sf::VertexArray& vertices, triangle& t, direction dir) {
 }
 
 int main() {
-	sf::RenderWindow window(sf::VideoMode(1080, 720), "Collision - two lines segment intersection");
-
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 8;
+	sf::RenderWindow window(sf::VideoMode(1080, 720), "Collision - two lines segment intersection", sf::Style::Default, settings);
+	
 	triangle triangle1 = { {
 		vec2{400.f, 20.f},
 		vec2{350.f, 300.f},

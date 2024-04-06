@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.8)
+﻿cmake_minimum_required(VERSION 3.2)
 
 project(Novomatic)
 
@@ -33,12 +33,13 @@ foreach(testsourcefile ${APP_SOURCES})
 endforeach(testsourcefile ${APP_SOURCES})
 
 
+# SFML configuration
+set(SFML_DIR ${CMAKE_SOURCE_DIR}/SFML/lib/cmake/SFML)
+set(SFML_STATIC_LIBRARIES TRUE)
+find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+
 # Include SFML directories and link libraries
-target_link_libraries(NOVOMATICLIB ${CMAKE_SOURCE_DIR}/SFML/lib/sfml-graphics.lib)
-target_link_libraries(NOVOMATICLIB ${CMAKE_SOURCE_DIR}/SFML/lib/sfml-audio.lib)
-target_link_libraries(NOVOMATICLIB ${CMAKE_SOURCE_DIR}/SFML/lib/sfml-network.lib)
-target_link_libraries(NOVOMATICLIB ${CMAKE_SOURCE_DIR}/SFML/lib/sfml-system.lib)
-target_link_libraries(NOVOMATICLIB ${CMAKE_SOURCE_DIR}/SFML/lib/sfml-window.lib)
+target_link_libraries(NOVOMATICLIB sfml-graphics sfml-audio sfml-network sfml-system sfml-window)
 
 include_directories(${CMAKE_SOURCE_DIR}/SFML/include)
 
