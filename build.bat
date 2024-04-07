@@ -1,5 +1,9 @@
 set OUT_DIR=out\build\x64-Debug
 
+
+if exist "out" (
+    rmdir /s /q out
+)
 if not exist "%OUT_DIR%" (
     mkdir "%OUT_DIR%"
 )

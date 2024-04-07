@@ -43,8 +43,6 @@ target_link_libraries(NOVOMATICLIB sfml-graphics sfml-audio sfml-network sfml-sy
 
 include_directories(${CMAKE_SOURCE_DIR}/SFML/include)
 
-
-
 # Copy .dll files into build/x64-Debug
 file(GLOB SFML_BIN_FILES ${CMAKE_SOURCE_DIR}/SFML/bin/*)
 
