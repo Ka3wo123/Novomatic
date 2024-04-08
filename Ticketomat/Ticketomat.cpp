@@ -27,7 +27,7 @@ void Ticketomat::renderTicketWindow(std::array<sf::Text, 5>& textArray, std::arr
 		}
 		sf::Text text;				
 		text.setFont(font);
-		text.setColor(sf::Color::Red);
+		text.setColor(sf::Color::Black);
 		text.setString("Bilet " + value + " zl");
 		text.setCharacterSize(20);
 
@@ -35,7 +35,7 @@ void Ticketomat::renderTicketWindow(std::array<sf::Text, 5>& textArray, std::arr
 
 		sf::RectangleShape button(sf::Vector2f(300.f, 60.f));
 		button.setPosition((window.getSize().x - button.getSize().x) / 2, 100 + 120 * i);
-		button.setOutlineThickness(2);
+		button.setOutlineThickness(2);		
 		button.setOutlineColor(sf::Color::Black);
 
 		buttonArray[i] = button;
@@ -48,7 +48,7 @@ void Ticketomat::renderTicketWindow(std::array<sf::Text, 5>& textArray, std::arr
 
 void Ticketomat::renderHomeWindow(sf::RenderWindow& window, sf::Font& font, sf::Text& welcomeText) {
 	welcomeText.setFont(font);
-	welcomeText.setColor(sf::Color::Red);
+	welcomeText.setColor(sf::Color::Black);
 	welcomeText.setString("Ticketomat");
 	welcomeText.setCharacterSize(50);
 

@@ -32,6 +32,13 @@ bool countExchange(sf::RectangleShape& button, sf::Vector2i& mousePos, size_t ti
 	}
 }
 
+void setTextPosition(sf::Text& text, float x, float y) {
+	sf::FloatRect textBounds = text.getLocalBounds();
+	text.setOrigin(textBounds.left + textBounds.width / 2.f, textBounds.top + textBounds.height / 2.f);
+	text.setPosition(x, y);
+
+}
+
 int main() {
 
 	constexpr size_t WINDOW_WIDTH = 600;
@@ -53,6 +60,32 @@ int main() {
 
 	sf::ConvexShape nextBtn;
 	sf::ConvexShape backBtn;
+	sf::RectangleShape logo(sf::Vector2f(250.f, 350.f));
+	sf::Texture logoTexture;
+
+	sf::Color colorTop(0, 128, 255);  
+	sf::Color colorBottom(255, 255, 255);
+	sf::VertexArray vertices(sf::Quads, 4);
+
+	vertices[0].position = sf::Vector2f(0, 0);              
+	vertices[1].position = sf::Vector2f(WINDOW_WIDTH, 0);   
+	vertices[2].position = sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT); 
+	vertices[3].position = sf::Vector2f(0, WINDOW_HEIGHT);
+
+	vertices[0].color = colorTop;
+	vertices[1].color = colorTop;
+	vertices[2].color = colorBottom;
+	vertices[3].color = colorBottom;
+
+
+	if (!(logoTexture.loadFromFile("..\\..\\..\\Ticketomat\\Images\\logo.png"))) {
+		throw std::runtime_error("Failed to load image logo");
+	}
+
+	logo.setFillColor(sf::Color::White);
+	logo.setTexture(&logoTexture);
+	logo.setPosition((WINDOW_WIDTH - logo.getSize().x) / 2.f, (WINDOW_HEIGHT - logo.getSize().y) / 2.f);
+	
 
 	nextBtn.setPointCount(5);
 	nextBtn.setPoint(0, sf::Vector2f(0, 0));
@@ -88,12 +121,13 @@ int main() {
 	sf::Text promptText;
 	sf::Text insufficientText;
 	sf::Text moneyText;
-	sf::Text exchangeText;
+	sf::Text changeText;
+	sf::Text printingTicketText;
 
 	promptText.setFont(arialFont);
 	promptText.setCharacterSize(24);
 	promptText.setColor(sf::Color::Black);
-	promptText.setString("Twoje saldo wynosi: 0");
+	promptText.setString("Wrzuc pieniadze (podaj liczbe z klawiatury)\nTwoje saldo wynosi: 0");
 
 	moneyText.setFont(arialFont);
 	moneyText.setCharacterSize(24);
@@ -101,25 +135,24 @@ int main() {
 	moneyText.setString("");
 
 	insufficientText.setFont(arialFont);
-	insufficientText.setCharacterSize(20);
+	insufficientText.setCharacterSize(28);
 	insufficientText.setColor(sf::Color::Red);
 	insufficientText.setString("Wrzuc wiecej pieniedzy, by kupic ten bilet");
 
-	exchangeText.setFont(arialFont);
-	exchangeText.setCharacterSize(24);
-	exchangeText.setColor(sf::Color::Black);
+	changeText.setFont(arialFont);
+	changeText.setCharacterSize(24);
+	changeText.setColor(sf::Color::Black);	
 
-	sf::FloatRect textBounds = promptText.getLocalBounds();
-	promptText.setOrigin(textBounds.left + textBounds.width / 2.f, textBounds.top + textBounds.height / 2.f);
-	promptText.setPosition(windows[1].getSize().x / 2.f, 100);
+	printingTicketText.setFont(arialFont);
+	printingTicketText.setCharacterSize(20);
+	printingTicketText.setColor(sf::Color::Red);
+	printingTicketText.setString("Trwa drukowanie biletu...");
 
-	sf::FloatRect textBoundsIncorrect = insufficientText.getLocalBounds();
-	insufficientText.setOrigin(textBoundsIncorrect.left + textBoundsIncorrect.width / 2.f, textBoundsIncorrect.top + textBoundsIncorrect.height / 2.f);
-	insufficientText.setPosition(windows[1].getSize().x / 2.f, 200);
-
-	sf::FloatRect textBoundsMoney = moneyText.getLocalBounds();
-	moneyText.setOrigin(textBoundsMoney.left + textBoundsMoney.width / 2.f, textBoundsMoney.top + textBoundsMoney.height / 2.f);
-	moneyText.setPosition(windows[1].getSize().x / 2.f, 200);
+	setTextPosition(promptText, WINDOW_WIDTH / 2.f, 100);
+	setTextPosition(insufficientText, WINDOW_WIDTH / 2.f, 200);
+	setTextPosition(moneyText, WINDOW_WIDTH / 2.f, 200);
+	setTextPosition(printingTicketText, WINDOW_HEIGHT / 2.f, 50);
+	setTextPosition(changeText, WINDOW_WIDTH / 2.f - 70, 200);
 
 
 	Ticketomat homeW;
@@ -132,6 +165,7 @@ int main() {
 
 
 	int windowNumber = 0;
+	bool isPicked = false;
 	while (windows[windowNumber].isOpen()) {
 
 		sf::Event event;
@@ -165,7 +199,7 @@ int main() {
 						for (const auto& pair : exchangeMap) {
 							tempText.append(std::to_string(pair.second)).append("x").append(std::to_string(pair.first)).append("zl\n");
 						}
-						exchangeText.setString("Twoja reszta:\n" + tempText);
+						changeText.setString("Odbierz swoj bilet\nTwoja reszta:\n" + tempText);
 						exchangeMap[5] = 0;
 						exchangeMap[2] = 0;
 						exchangeMap[1] = 0;
@@ -173,14 +207,39 @@ int main() {
 						visibleArr[windowNumber] = false;
 						visibleArr[++windowNumber] = true;
 
+						float progressBarWidth = 0.0f;
+						sf::RectangleShape progressBar(sf::Vector2f(0, 20));
+						progressBar.setFillColor(sf::Color::Green);
+						progressBar.setPosition(50, 100);
+
+						sf::Clock progressBarClock;
+						for (int i = 0; i < 4; i++) {
+							float elapsedTime = progressBarClock.getElapsedTime().asSeconds();
+							float progress = elapsedTime / 3.0f;
+							progressBarWidth = progress * (WINDOW_WIDTH - 100);
+							progressBar.setSize(sf::Vector2f(progressBarWidth, 20));
+
+
+							windows[2].clear(sf::Color::White);
+							windows[2].draw(progressBar);
+							windows[2].draw(printingTicketText);
+							windows[2].display();
+
+							sf::sleep(sf::seconds(1));
+						}
+									
+
+
 						for (int i = 0; i < 4; i++) {
 							windows[i].clear();
 						}
 					}
-					/*else {						
+					else {										
+						isPicked = true;
+						windows[2].clear(sf::Color::White);
 						windows[2].draw(insufficientText);
 						windows[2].display();
-					}*/
+					}
 				}
 			}
 
@@ -191,19 +250,18 @@ int main() {
 
 					windowNumber = 0;
 					for (int i = 0; i < 4; i++) {
-						visibleArr[i] = false;
-						windows[i].clear(sf::Color::White);
-					}
+						visibleArr[i] = false;							
+					}					
 					visibleArr[0] = true;
 					sum = 0;
-					promptText.setString("Twoje saldo wynosi: 0");
+					promptText.setString("Wrzuc pieniadze (podaj liczbe z klawiatury)\nTwoje saldo wynosi: 0");
 				}
 
 				else if (backBtn.getGlobalBounds().contains(sf::Vector2f(mousePos)) && windowNumber > 0 && backBtn.getGlobalBounds().contains(sf::Vector2f(mousePos)) && windowNumber < 3) {
 					if (windowNumber == 1) {
 						sum = 0;
 						moneyOutput.str("");
-						promptText.setString("Twoje saldo wynosi: 0");
+						promptText.setString("Wrzuc pieniadze (podaj liczbe z klawiatury)\nTwoje saldo wynosi: 0");
 						moneyText.setString("");
 					}
 					visibleArr[windowNumber] = false;
@@ -218,9 +276,9 @@ int main() {
 					visibleArr[windowNumber] = false;
 					visibleArr[++windowNumber] = true;
 
-					for (int i = 0; i < 4; i++) {
+					/*for (int i = 0; i < 4; i++) {
 						windows[i].clear();
-					}
+					}*/
 
 				}
 			}
@@ -253,7 +311,7 @@ int main() {
 					ss << static_cast<char>(event.text.unicode);
 					moneyOutput << static_cast<char>(event.text.unicode);
 				}
-				promptText.setString("Twoje saldo wynosi: " + std::to_string(sum));
+				promptText.setString("Wrzuc pieniadze (podaj liczbe z klawiatury)\nTwoje saldo wynosi: " + std::to_string(sum));
 				moneyText.setString(moneyOutput.str());
 			}
 
@@ -265,14 +323,16 @@ int main() {
 				windows[i].clear(sf::Color::White);
 			}
 
+			if (isPicked) {
+				isPicked = false;
+				sf::sleep(sf::seconds(2));
+				continue;
+			}
 
-			// draw section
-			windows[0].draw(welcomeText);
-			windows[1].draw(promptText);
-			windows[1].draw(moneyText);
-			windows[3].draw(exchangeText);			
 
+			// draw section		
 			for (auto& w : windows) {
+				w.draw(vertices);
 				if (windowNumber == 0 || windowNumber == 3) {
 					w.draw(nextBtn);
 				}
@@ -282,9 +342,16 @@ int main() {
 				else {
 					w.draw(nextBtn);
 					w.draw(backBtn);
-				}
 
+				}
 			}
+			windows[0].draw(logo);
+			windows[0].draw(welcomeText);
+			windows[1].draw(promptText);
+			windows[1].draw(moneyText);
+			windows[3].draw(changeText);			
+
+			
 			for (auto& b : buttonArray) {
 				windows[2].draw(b);
 			}

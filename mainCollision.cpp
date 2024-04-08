@@ -44,13 +44,13 @@ int main() {
 	triangle triangle1 = { {
 		vec2{400.f, 20.f},
 		vec2{350.f, 300.f},
-		vec2{450.f, 300.f}
+		vec2{300.f, 300.f}
 	} };
 
 	triangle triangle2 = { {
-		vec2{400.f, 150.f},
-		vec2{200.f, 10.f},
-		vec2{460.f, 10.f}
+		vec2{400.f, 250.f},
+		vec2{700.f, 10.f},
+		vec2{560.f, 10.f}
 	} };
 
 	bool isOverlap = false;
