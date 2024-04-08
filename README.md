@@ -5,5 +5,5 @@
 
 # Run using build.bat file
 - launch build.bat file in base directory (it will create /out dir and executables)
-- navigate to ./out/build/x64-Debug/Debug directory
+- navigate to ```./out/build/x64-Debug/Debug``` directory
 - pick and launch .exe file
